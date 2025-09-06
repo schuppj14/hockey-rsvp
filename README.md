@@ -1,2 +1,434 @@
-# hockey-rsvp
-The RSVP system for Lynch hockey skate RSVP
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fridays pick-up at Lynch RSVP</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Avenir', 'Garamond', 'Times New Roman', serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+        }
+        
+        .banner-image {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #1e3c72;
+            margin-bottom: 10px;
+            font-size: 2em;
+            font-weight: 600;
+            line-height: 1.1;
+        }
+        
+        .date-info {
+            color: #666;
+            font-size: 1.1em;
+            margin-bottom: 30px;
+            font-weight: 500;
+        }
+        
+        .skater-count-section {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        
+        .skater-label {
+            display: block;
+            color: #1e3c72;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 1em;
+        }
+        
+        .skater-dropdown {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 1em;
+            background: white;
+            cursor: pointer;
+            transition: border-color 0.3s ease;
+        }
+        
+        .skater-dropdown:focus {
+            outline: none;
+            border-color: #2a5298;
+        }
+        
+        .name-inputs-container {
+            margin-bottom: 20px;
+        }
+        
+        .name-input {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 1.1em;
+            margin-bottom: 15px;
+            transition: border-color 0.3s ease;
+        }
+        
+        .name-input:last-child {
+            margin-bottom: 0;
+        }
+        
+        .name-input:focus {
+            outline: none;
+            border-color: #2a5298;
+        }
+        
+        .button-container {
+            display: flex;
+            gap: 20px;
+            flex-direction: column;
+        }
+        
+        .rsvp-button {
+            padding: 20px 40px;
+            font-size: 1.3em;
+            font-weight: 600;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: block;
+            color: black;
+        }
+        
+        .btn-in {
+            background: linear-gradient(135deg, #28a745, #20c997);
+        }
+        
+        .btn-in:hover {
+            background: linear-gradient(135deg, #218838, #1ba085);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(40, 167, 69, 0.3);
+        }
+        
+        .btn-out {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+        }
+        
+        .btn-out:hover {
+            background: linear-gradient(135deg, #c82333, #a71e2a);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(220, 53, 69, 0.3);
+        }
+        
+        .emoji {
+            color: black !important;
+            text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
+        }
+        
+        .info-text {
+            margin-top: 30px;
+            color: #666;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+        
+        .error-message {
+            color: #dc3545;
+            margin-top: 10px;
+            font-size: 0.9em;
+            display: none;
+        }
+        
+        .success-message {
+            color: #28a745;
+            margin-top: 10px;
+            font-size: 0.9em;
+            display: none;
+        }
+        
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+        
+        @media (min-width: 500px) {
+            .button-container {
+                flex-direction: row;
+            }
+            
+            .rsvp-button {
+                flex: 1;
+            }
+        }
+        
+        @media (max-width: 499px) {
+            .container {
+                padding: 30px 20px;
+            }
+            
+            h1 {
+                font-size: 1.6em;
+            }
+            
+            .rsvp-button {
+                padding: 18px 30px;
+                font-size: 1.2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="banner.jpg" alt="Lynch Hockey Banner" class="banner-image">
+        <h1>Fridays pick-up at Lynch RSVP</h1>
+        <div class="date-info" id="dateInfo">
+            Loading date...
+        </div>
+        
+        <div class="skater-count-section">
+            <label for="skaterCount" class="skater-label">Number of skaters:</label>
+            <select id="skaterCount" class="skater-dropdown" onchange="updateNameInputs()">
+                <option value="1">1 skater</option>
+                <option value="2">2 skaters</option>
+                <option value="3">3 skaters</option>
+            </select>
+        </div>
+        
+        <div id="nameInputs" class="name-inputs-container">
+            <!-- Name inputs will be generated here -->
+        </div>
+        
+        <div class="error-message" id="errorMessage">
+            Please enter all skater names before submitting your RSVP.
+        </div>
+        
+        <div class="success-message" id="successMessage">
+            RSVP submitted successfully! Thanks for responding.
+        </div>
+        
+        <div class="button-container">
+            <button class="rsvp-button btn-in" onclick="submitRSVP('IN')">
+                <span class="emoji">✅</span> I'M IN
+            </button>
+            <button class="rsvp-button btn-out" onclick="submitRSVP('OUT')">
+                <span class="emoji">❌</span> I'M OUT
+            </button>
+        </div>
+        
+        <div class="info-text">
+            Updates on numbers later in the day.
+        </div>
+    </div>
+
+    <script>
+        // Google Sheets configuration
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxpwaHXpAQu43RdlcGOg--8DJdDnq-0_FhZcwSw9v2hDIC1hhuwU0dp1jeq5eUN8CVV/exec'; // Replace with your Google Apps Script URL
+        
+        function updateNameInputs() {
+            const skaterCount = parseInt(document.getElementById('skaterCount').value);
+            const container = document.getElementById('nameInputs');
+            
+            // Clear existing inputs
+            container.innerHTML = '';
+            
+            // Create the right number of input fields
+            for (let i = 1; i <= skaterCount; i++) {
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.id = 'playerName' + i;
+                input.className = 'name-input';
+                input.placeholder = skaterCount === 1 ? 'Enter name' : 'Enter name ' + i;
+                input.required = true;
+                
+                // Add enter key handler
+                input.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        submitRSVP('IN');
+                    }
+                });
+                
+                container.appendChild(input);
+            }
+            
+            // Focus on first input
+            setTimeout(function() {
+                const firstInput = document.getElementById('playerName1');
+                if (firstInput) {
+                    firstInput.focus();
+                }
+            }, 100);
+        }
+        
+        function submitRSVP(response) {
+            const skaterCount = parseInt(document.getElementById('skaterCount').value);
+            const errorMessage = document.getElementById('errorMessage');
+            const successMessage = document.getElementById('successMessage');
+            const container = document.querySelector('.container');
+            
+            // Collect all names
+            const playerNames = [];
+            let allNamesEntered = true;
+            
+            for (let i = 1; i <= skaterCount; i++) {
+                const nameInput = document.getElementById('playerName' + i);
+                if (nameInput) {
+                    const name = nameInput.value.trim();
+                    if (!name) {
+                        allNamesEntered = false;
+                        nameInput.focus();
+                        break;
+                    }
+                    playerNames.push(name);
+                }
+            }
+            
+            // Hide previous messages
+            errorMessage.style.display = 'none';
+            successMessage.style.display = 'none';
+            
+            if (!allNamesEntered) {
+                errorMessage.style.display = 'block';
+                return false;
+            }
+            
+            // Show loading state
+            container.classList.add('loading');
+            
+            // Get the next Friday date
+            const nextFriday = getNextFriday();
+            const dateStr = nextFriday.toLocaleDateString('en-US', { 
+                month: 'long', 
+                day: 'numeric',
+                year: 'numeric'
+            });
+            
+            // Create combined name string
+            const allNames = playerNames.join(', ');
+            const skatersText = skaterCount === 1 ? 'skater' : 'skaters';
+            
+            // Prepare data for Google Sheets
+            const data = {
+                timestamp: new Date().toISOString(),
+                name: allNames,
+                response: response,
+                date: dateStr,
+                skaterCount: skaterCount,
+                individualNames: playerNames.join(' | '), // Pipe-separated for easy splitting
+                submittedAt: new Date().toLocaleString(),
+                submittedBy: playerNames[0] // First person who submitted
+            };
+            
+            // Send to Google Sheets (if URL is configured)
+            if (GOOGLE_SCRIPT_URL && GOOGLE_SCRIPT_URL !== 'YOUR_GOOGLE_SCRIPT_URL_HERE') {
+                fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                })
+                .then(function() {
+                    container.classList.remove('loading');
+                    successMessage.innerHTML = 'RSVP submitted successfully for ' + skaterCount + ' ' + skatersText + '!<br>Thanks for responding.';
+                    successMessage.style.display = 'block';
+                    
+                    // Clear all inputs
+                    for (let i = 1; i <= skaterCount; i++) {
+                        const input = document.getElementById('playerName' + i);
+                        if (input) {
+                            input.value = '';
+                        }
+                    }
+                })
+                .catch(function(error) {
+                    console.error('Error:', error);
+                    container.classList.remove('loading');
+                    // Fallback to email if Google Sheets fails
+                    fallbackToEmail(allNames, response, dateStr, skaterCount, skatersText);
+                });
+            } else {
+                // If Google Sheets not configured, use email fallback
+                container.classList.remove('loading');
+                fallbackToEmail(allNames, response, dateStr, skaterCount, skatersText);
+            }
+            
+            return false;
+        }
+        
+        function fallbackToEmail(playerNames, response, dateStr, skaterCount, skatersText) {
+            const recipientEmail = 'schupp.14@gmail.com'; // Replace with your email
+            const subject = 'Hockey RSVP: ' + playerNames + ' - ' + response + ' (' + skaterCount + ' ' + skatersText + ')';
+            const responseText = response === 'IN' ? 'are coming' : 'are not coming';
+            const body = 'Hi Justin,\n\n' + 
+                        playerNames + ' ' + responseText + ' for Friday hockey (' + dateStr + ').\n\n' +
+                        'Response: ' + response + '\n' +
+                        (skaterCount === 1 ? 'Skater' : 'Skaters') + ': ' + playerNames + '\n' +
+                        'Total Count: ' + skaterCount + ' ' + skatersText + '\n' +
+                        'Submitted: ' + new Date().toLocaleString() + '\n\n' +
+                        'Thanks!\n' + playerNames.split(', ')[0];
+
+            const mailtoLink = 'mailto:' + recipientEmail + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+            window.location.href = mailtoLink;
+        }
+        
+        function getNextFriday() {
+            const today = new Date();
+            const daysUntilFriday = (5 - today.getDay() + 7) % 7;
+            const nextFriday = new Date(today);
+            
+            if (daysUntilFriday === 0) {
+                // If today is Friday, get next Friday
+                nextFriday.setDate(today.getDate() + 7);
+            } else {
+                nextFriday.setDate(today.getDate() + daysUntilFriday);
+            }
+            
+            return nextFriday;
+        }
+        
+        function updateDateDisplay() {
+            const nextFriday = getNextFriday();
+            const month = nextFriday.toLocaleDateString('en-US', { month: 'long' });
+            const day = nextFriday.getDate();
+            
+            const dateElement = document.getElementById('dateInfo');
+            if (dateElement) {
+                dateElement.innerHTML = 'Friday ' + month + ' ' + day + ' - 6:30 to 7:30am';
+            }
+        }
+        
+        // Initialize when page loads
+        window.onload = function() {
+            updateDateDisplay();
+            updateNameInputs(); // Set up initial name input
+        };
+    </script>
+</body>
+</html>
