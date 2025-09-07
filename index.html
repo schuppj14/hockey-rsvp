@@ -248,7 +248,7 @@
 
     <script>
         // Google Sheets configuration
-        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxpwaHXpAQu43RdlcGOg--8DJdDnq-0_FhZcwSw9v2hDIC1hhuwU0dp1jeq5eUN8CVV/exec'; // Replace with your Google Apps Script URL
+        const GOOGLE_SCRIPT_URL = 'YOUR_GOOGLE_SCRIPT_URL_HERE'; // Replace with your Google Apps Script URL
         
         function updateNameInputs() {
             const skaterCount = parseInt(document.getElementById('skaterCount').value);
@@ -288,7 +288,6 @@
         function submitRSVP(response) {
             const skaterCount = parseInt(document.getElementById('skaterCount').value);
             const errorMessage = document.getElementById('errorMessage');
-            const successMessage = document.getElementById('successMessage');
             const container = document.querySelector('.container');
             
             // Collect all names
@@ -310,7 +309,6 @@
             
             // Hide previous messages
             errorMessage.style.display = 'none';
-            successMessage.style.display = 'none';
             
             if (!allNamesEntered) {
                 errorMessage.style.display = 'block';
@@ -356,8 +354,7 @@
                 })
                 .then(function() {
                     container.classList.remove('loading');
-                    successMessage.innerHTML = 'RSVP submitted successfully for ' + skaterCount + ' ' + skatersText + '!<br>Thanks for responding.';
-                    successMessage.style.display = 'block';
+                    showSuccessPopup(skaterCount, skatersText);
                     
                     // Clear all inputs
                     for (let i = 1; i <= skaterCount; i++) {
@@ -382,8 +379,21 @@
             return false;
         }
         
+        function showSuccessPopup(skaterCount, skatersText) {
+            const successText = document.getElementById('successText');
+            successText.innerHTML = 'Successfully submitted for ' + skaterCount + ' ' + skatersText + '!<br>Thanks for responding.';
+            
+            document.getElementById('popupOverlay').classList.add('show');
+            document.getElementById('successPopup').classList.add('show');
+        }
+        
+        function closeSuccessPopup() {
+            document.getElementById('popupOverlay').classList.remove('show');
+            document.getElementById('successPopup').classList.remove('show');
+        }
+        
         function fallbackToEmail(playerNames, response, dateStr, skaterCount, skatersText) {
-            const recipientEmail = 'schupp.14@gmail.com'; // Replace with your email
+            const recipientEmail = 'YOUR_EMAIL@example.com'; // Replace with your email
             const subject = 'Hockey RSVP: ' + playerNames + ' - ' + response + ' (' + skaterCount + ' ' + skatersText + ')';
             const responseText = response === 'IN' ? 'are coming' : 'are not coming';
             const body = 'Hi Justin,\n\n' + 
