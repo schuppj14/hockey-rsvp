@@ -146,11 +146,6 @@
             box-shadow: 0 8px 25px rgba(220, 53, 69, 0.3);
         }
         
-        .emoji {
-            color: black !important;
-            text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
-        }
-        
         .info-text {
             margin-top: 30px;
             color: #666;
@@ -165,16 +160,96 @@
             display: none;
         }
         
-        .success-message {
-            color: #28a745;
-            margin-top: 10px;
-            font-size: 0.9em;
-            display: none;
-        }
-        
         .loading {
             opacity: 0.6;
             pointer-events: none;
+        }
+        
+        .success-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            text-align: center;
+            z-index: 1000;
+            display: none;
+            max-width: 400px;
+            width: 90%;
+        }
+        
+        .success-popup.show {
+            display: block;
+            animation: popupAppear 0.4s ease-out;
+        }
+        
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+            display: none;
+        }
+        
+        .popup-overlay.show {
+            display: block;
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        @keyframes popupAppear {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.8);
+            }
+            100% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+        
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+        
+        .success-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+        
+        .success-title {
+            color: #1e3c72;
+            font-size: 1.5em;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .success-text {
+            color: #666;
+            font-size: 1.1em;
+            margin-bottom: 30px;
+        }
+        
+        .close-popup-btn {
+            background: #1e3c72;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 10px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        
+        .close-popup-btn:hover {
+            background: #2a5298;
         }
         
         @media (min-width: 500px) {
@@ -228,16 +303,12 @@
             Please enter all skater names before submitting your RSVP.
         </div>
         
-        <div class="success-message" id="successMessage">
-            RSVP submitted successfully! Thanks for responding.
-        </div>
-        
         <div class="button-container">
             <button class="rsvp-button btn-in" onclick="submitRSVP('IN')">
-                <span class="emoji">✅</span> I'M IN
+                I'M IN
             </button>
             <button class="rsvp-button btn-out" onclick="submitRSVP('OUT')">
-                <span class="emoji">❌</span> I'M OUT
+                I'M OUT
             </button>
         </div>
         
@@ -246,9 +317,21 @@
         </div>
     </div>
 
+    <!-- Success Popup -->
+    <div class="popup-overlay" id="popupOverlay" onclick="closeSuccessPopup()"></div>
+    <div class="success-popup" id="successPopup">
+        <div class="success-icon">🎉</div>
+        <div class="success-title">RSVP Submitted!</div>
+        <div class="success-text" id="successText">
+            Successfully submitted for 1 skater!<br>Thanks for responding.
+        </div>
+        <button class="close-popup-btn" onclick="closeSuccessPopup()">Got it!</button>
+    </div>
+
     <script>
         // Google Sheets configuration
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxpwaHXpAQu43RdlcGOg--8DJdDnq-0_FhZcwSw9v2hDIC1hhuwU0dp1jeq5eUN8CVV/exec'; // Replace with your Google Apps Script URL        
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxpwaHXpAQu43RdlcGOg--8DJdDnq-0_FhZcwSw9v2hDIC1hhuwU0dp1jeq5eUN8CVV/exec';
+        
         function updateNameInputs() {
             const skaterCount = parseInt(document.getElementById('skaterCount').value);
             const container = document.getElementById('nameInputs');
@@ -392,7 +475,7 @@ const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxpwaHXpAQu43
         }
         
         function fallbackToEmail(playerNames, response, dateStr, skaterCount, skatersText) {
-const recipientEmail = 'schupp.14@gmail.com'; // Replace with your email
+            const recipientEmail = 'schupp.14@gmail.com';
             const subject = 'Hockey RSVP: ' + playerNames + ' - ' + response + ' (' + skaterCount + ' ' + skatersText + ')';
             const responseText = response === 'IN' ? 'are coming' : 'are not coming';
             const body = 'Hi Justin,\n\n' + 
