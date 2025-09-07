@@ -248,8 +248,7 @@
 
     <script>
         // Google Sheets configuration
-        const GOOGLE_SCRIPT_URL = 'YOUR_GOOGLE_SCRIPT_URL_HERE'; // Replace with your Google Apps Script URL
-        
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxpwaHXpAQu43RdlcGOg--8DJdDnq-0_FhZcwSw9v2hDIC1hhuwU0dp1jeq5eUN8CVV/exec'; // Replace with your Google Apps Script URL        
         function updateNameInputs() {
             const skaterCount = parseInt(document.getElementById('skaterCount').value);
             const container = document.getElementById('nameInputs');
@@ -393,7 +392,7 @@
         }
         
         function fallbackToEmail(playerNames, response, dateStr, skaterCount, skatersText) {
-            const recipientEmail = 'YOUR_EMAIL@example.com'; // Replace with your email
+const recipientEmail = 'schupp.14@gmail.com'; // Replace with your email
             const subject = 'Hockey RSVP: ' + playerNames + ' - ' + response + ' (' + skaterCount + ' ' + skatersText + ')';
             const responseText = response === 'IN' ? 'are coming' : 'are not coming';
             const body = 'Hi Justin,\n\n' + 
